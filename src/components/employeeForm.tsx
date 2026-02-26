@@ -10,13 +10,24 @@ import Button from "../ui/Button";
 import { createEmployee } from "../api/employee.api";
 
 const phoneRegex = /^[0-9+ -]{10,15}$/;
-const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
+
+const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
 const MAX_DOC_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_DOC_TYPES = [
   "application/pdf",
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
+
+// Optional upload docs (police/medical report) - you can keep 5MB too
+const MAX_REPORT_SIZE = 5 * 1024 * 1024;
+const ACCEPTED_REPORT_TYPES = [
+  ...ACCEPTED_DOC_TYPES,
+  "image/jpeg",
+  "image/png",
+  "image/webp",
 ];
 
 const schema = z
@@ -26,17 +37,30 @@ const schema = z
 
     documentsFile: z
       .any()
-      .refine((files) => files instanceof FileList && files.length === 1, "Document file is required")
-      .refine((files) => files?.[0]?.size <= MAX_DOC_FILE_SIZE, "Max file size is 5MB")
-      .refine((files) => ACCEPTED_DOC_TYPES.includes(files?.[0]?.type), "Only PDF / DOC / DOCX files allowed"),
+      .refine(
+        (files) => files instanceof FileList && files.length === 1,
+        "Document file is required"
+      )
+      .refine(
+        (files) => files?.[0]?.size <= MAX_DOC_FILE_SIZE,
+        "Max file size is 5MB"
+      )
+      .refine(
+        (files) => ACCEPTED_DOC_TYPES.includes(files?.[0]?.type),
+        "Only PDF / DOC / DOCX files allowed"
+      ),
 
     aadharName: z.string().min(2, "Aadhar name is required"),
-    aadharNumber: z.string().regex(/^\d{12}$/, "Aadhar number must be exactly 12 digits"),
+    aadharNumber: z
+      .string()
+      .regex(/^\d{12}$/, "Aadhar number must be exactly 12 digits"),
 
     passportNumber: z.string().optional(),
     passportValidity: z.string().optional(),
 
-    panNumber: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i, "Invalid PAN format"),
+    panNumber: z
+      .string()
+      .regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i, "Invalid PAN format"),
 
     phoneNumber: z.string().regex(phoneRegex, "Invalid phone number"),
 
@@ -44,10 +68,17 @@ const schema = z
     address: z.string().min(5, "Address is required"),
     city: z.string().min(2, "City is required"),
     state: z.string().min(2, "State is required"),
-    postalCode: z.string().min(4, "Postal code is required").max(10, "Postal code too long"),
+    postalCode: z
+      .string()
+      .min(4, "Postal code is required")
+      .max(10, "Postal code too long"),
 
     fatherName: z.string().min(2, "Father name is required"),
     motherName: z.string().min(2, "Mother name is required"),
+
+    // ✅ New family fields
+    siblings: z.string().min(1, "Siblings field required"),
+    localGuardian: z.string().min(2, "Local guardian required"),
 
     bankAccountHolderName: z.string().min(2, "Account holder name is required"),
     bankAccountNumber: z
@@ -55,13 +86,21 @@ const schema = z
       .min(6, "Account number is required")
       .max(18, "Account number too long")
       .regex(/^\d+$/, "Account number must be numeric"),
-    bankIfscCode: z.string().regex(/^[A-Z]{4}0[A-Z0-9]{6}$/i, "Invalid IFSC code"),
+    bankIfscCode: z
+      .string()
+      .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/i, "Invalid IFSC code"),
     bankBranchName: z.string().min(2, "Branch name is required"),
     bankCancelledCheque: z
       .any()
-      .refine((files) => files instanceof FileList && files.length === 1, "Cancelled cheque photo is required")
-      .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, "Max file size is 3MB")
-      .refine((files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type), "Only JPG/PNG/WebP allowed"),
+      .refine(
+        (files) => files instanceof FileList && files.length === 1,
+        "Cancelled cheque photo is required"
+      )
+      .refine((files) => files?.[0]?.size <= MAX_IMAGE_SIZE, "Max file size is 3MB")
+      .refine(
+        (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
+        "Only JPG/PNG/WebP allowed"
+      ),
 
     emergencyContactName: z.string().min(2, "Emergency contact name is required"),
     emergencyContactPhone: z.string().regex(phoneRegex, "Invalid emergency phone"),
@@ -75,45 +114,92 @@ const schema = z
     favouriteCuisine: z.string().min(2, "This field is required"),
     favouriteMoviesBollywood: z.string().min(2, "This field is required"),
 
-    tshirtSize: z.enum(["XS", "S", "M", "L", "XL", "XXL"]),
+    tshirtSize: z.enum(["XS", "S", "M", "L", "XL", "XXL", "XXXL", "4XL", "5XL"]),
     shoeSize: z.string().min(1, "Shoe size is required"),
+
+    // ✅ Police
     policeVerification: z.enum(["yes", "no"]),
+    policeStation: z.string().optional().or(z.literal("")),
+    policeReportFile: z.any().optional(),
 
-policeStation: z.string().optional(),
-
-policeReportFile: z
-  .any()
-  .optional()
-  .refine(
-    (files) =>
-      !files ||
-      files.length === 0 ||
-      files[0].size <= 3 * 1024 * 1024,
-    "Police report max size 3MB"
-  ),
-
-siblings: z.string().min(1, "Siblings field required"),
-localGuardian: z.string().min(2, "Local guardian required"),
-
-medicalReportRecent: z.enum(["yes", "no"]),
-
-medicalReportFile: z
-  .any()
-  .optional()
-  .refine(
-    (files) =>
-      !files ||
-      files.length === 0 ||
-      files[0].size <= 3 * 1024 * 1024,
-    "Medical report max size 3MB"
-  ),
+    // ✅ Medical report
+    medicalReportRecent: z.enum(["yes", "no"]),
+    medicalReportFile: z.any().optional(),
 
     hasMedicalInsurance: z.enum(["yes", "no"]),
     medicalIssues: z.string().optional().or(z.literal("")),
   })
-  .refine((data) => (data.medicalIssues ? data.medicalIssues.length >= 2 : true), {
-    message: "Medical issues should be at least 2 characters",
-    path: ["medicalIssues"],
+  // ✅ Require police station + report if policeVerification is yes
+  .superRefine((data, ctx) => {
+    if (data.policeVerification === "yes") {
+      if (!data.policeStation || data.policeStation.trim().length < 2) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["policeStation"],
+          message: "Police station is required",
+        });
+      }
+
+      const f = data.policeReportFile as FileList | undefined;
+      if (!f || f.length !== 1) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["policeReportFile"],
+          message: "Police verification report is required",
+        });
+      } else {
+        const file = f[0];
+        if (file.size > MAX_REPORT_SIZE) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["policeReportFile"],
+            message: "Police report max size is 5MB",
+          });
+        }
+        if (!ACCEPTED_REPORT_TYPES.includes(file.type)) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["policeReportFile"],
+            message: "Police report must be PDF/DOC/DOCX or image",
+          });
+        }
+      }
+    }
+
+    if (data.medicalReportRecent === "yes") {
+      const f = data.medicalReportFile as FileList | undefined;
+      if (!f || f.length !== 1) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["medicalReportFile"],
+          message: "Medical report is required",
+        });
+      } else {
+        const file = f[0];
+        if (file.size > MAX_REPORT_SIZE) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["medicalReportFile"],
+            message: "Medical report max size is 5MB",
+          });
+        }
+        if (!ACCEPTED_REPORT_TYPES.includes(file.type)) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["medicalReportFile"],
+            message: "Medical report must be PDF/DOC/DOCX or image",
+          });
+        }
+      }
+    }
+
+    if (data.medicalIssues && data.medicalIssues.trim().length > 0 && data.medicalIssues.trim().length < 2) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["medicalIssues"],
+        message: "Medical issues should be at least 2 characters",
+      });
+    }
   });
 
 export default function EmployeeForm() {
@@ -156,6 +242,9 @@ export default function EmployeeForm() {
       fatherName: "",
       motherName: "",
 
+      siblings: "",
+      localGuardian: "",
+
       bankAccountHolderName: "",
       bankAccountNumber: "",
       bankIfscCode: "",
@@ -176,15 +265,13 @@ export default function EmployeeForm() {
 
       tshirtSize: "M",
       shoeSize: "",
+
       policeVerification: "no",
-policeStation: "",
-policeReportFile: undefined as any,
+      policeStation: "",
+      policeReportFile: undefined as any,
 
-siblings: "",
-localGuardian: "",
-
-medicalReportRecent: "no",
-medicalReportFile: undefined as any,
+      medicalReportRecent: "no",
+      medicalReportFile: undefined as any,
 
       hasMedicalInsurance: "no",
       medicalIssues: "",
@@ -196,12 +283,8 @@ medicalReportFile: undefined as any,
 
     try {
       const result = await createEmployee(values);
-
       toast.success("Form submitted successfully 🎉");
-      // optional: show ID also
       // toast.success(`Submitted! ID: ${result.id}`);
-
-      // setServerMsg(`Submitted successfully! ID: ${result.id}`);
       reset();
     } catch (err: any) {
       const msg = err?.response?.data?.detail || "Something went wrong.";

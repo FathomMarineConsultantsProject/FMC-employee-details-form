@@ -1,8 +1,23 @@
+export type YesNo = "yes" | "no";
+
+export type TshirtSize =
+  | "XS"
+  | "S"
+  | "M"
+  | "L"
+  | "XL"
+  | "XXL"
+  | "XXXL"
+  | "4XL"
+  | "5XL";
+
 export type EmployeeFormValues = {
-  // Existing
   fullName: string;
   latestQualification: string;
-documentsFile: FileList;
+
+  documentsFile: FileList;
+
+  // (kept because you already have these in defaultValues; you can delete later if not used)
   prCardName: string;
   prCardValidity: string;
 
@@ -16,45 +31,53 @@ documentsFile: FileList;
   panNumber: string;
   phoneNumber: string;
 
-  // New: Contact
   email: string;
   address: string;
   city: string;
   state: string;
   postalCode: string;
 
-    bankAccountHolderName: string;
+  bankAccountHolderName: string;
   bankAccountNumber: string;
   bankIfscCode: string;
   bankBranchName: string;
   bankCancelledCheque: FileList;
 
-  // New: Family
   fatherName: string;
   motherName: string;
 
-  // New: Emergency contact section
+  // ✅ New family fields
+  siblings: string;
+  localGuardian: string;
+
+  // ✅ Police verification
+  policeVerification: YesNo;
+  policeStation?: string;
+  policeReportFile?: FileList;
+
+  // ✅ Medical report
+  medicalReportRecent: YesNo;
+  medicalReportFile?: FileList;
+
   emergencyContactName: string;
   emergencyContactPhone: string;
   emergencyContactEmail: string;
   emergencyContactRelation: string;
 
-  // New: Personal
   hobbies: string;
   booksLikeToRead: string;
-sportsYouPlay: string;
-favouriteArtist: string;
-favouriteCuisine: string;
-favouriteMoviesBollywood: string;
+  sportsYouPlay: string;
+  favouriteArtist: string;
+  favouriteCuisine: string;
+  favouriteMoviesBollywood: string;
 
-tshirtSize: "XS" | "S" | "M" | "L" | "XL" | "XXL"| "XXXL";
-shoeSize: string; // keep as string so you can accept 6, 7, 8.5, 42 etc.
+  tshirtSize: TshirtSize;
+  shoeSize: string;
 
-  // New: Medical
-  hasMedicalInsurance: "yes" | "no";
+  hasMedicalInsurance: YesNo;
   medicalIssues?: string;
 };
-// Later (when backend is ready) you can extend like:
+
 export type EmployeeCreateRequest = EmployeeFormValues;
 
 export type EmployeeCreateResponse = {
