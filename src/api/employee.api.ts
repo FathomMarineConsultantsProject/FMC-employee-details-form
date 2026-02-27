@@ -26,8 +26,8 @@ export async function createEmployee(
   fd.append("data", JSON.stringify(payload));
 
   // ✅ Required files
-  fd.append("documentsFile", formValues.documentsFile?.[0]);
-  fd.append("bankCancelledCheque", formValues.bankCancelledCheque?.[0]);
+  fd.append("documentsFile", formValues.documentsFile[0]);
+fd.append("bankCancelledCheque", formValues.bankCancelledCheque[0]);
 
   // ✅ Optional files
   if (formValues.policeReportFile?.length) {
