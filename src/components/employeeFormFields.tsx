@@ -328,7 +328,7 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
         />
         <Input
           label="Local Guardian"
-          requiredMark
+          // requiredMark
           placeholder="Enter guardian name"
           error={errors.localGuardian?.message}
           {...register("localGuardian")}

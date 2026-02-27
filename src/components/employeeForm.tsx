@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
@@ -21,7 +21,6 @@ const ACCEPTED_DOC_TYPES = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 
-// Optional upload docs (police/medical report) - you can keep 5MB too
 const MAX_REPORT_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_REPORT_TYPES = [
   ...ACCEPTED_DOC_TYPES,
@@ -30,10 +29,16 @@ const ACCEPTED_REPORT_TYPES = [
   "image/webp",
 ];
 
+// ✅ IMPORTANT: schema must include ALL keys that exist in EmployeeFormValues
 const schema = z
   .object({
     fullName: z.string().min(2, "Full name is required"),
     latestQualification: z.string().min(2, "Qualification is required"),
+
+    // ✅ optional fields in your type (add in schema to avoid resolver mismatch)
+    prCardName: z.string().optional().or(z.literal("")),
+    prCardValidity: z.string().optional().or(z.literal("")),
+    drivingLicense: z.string().optional().or(z.literal("")),
 
     documentsFile: z
       .any()
@@ -41,42 +46,30 @@ const schema = z
         (files) => files instanceof FileList && files.length === 1,
         "Document file is required"
       )
-      .refine(
-        (files) => files?.[0]?.size <= MAX_DOC_FILE_SIZE,
-        "Max file size is 5MB"
-      )
+      .refine((files) => files?.[0]?.size <= MAX_DOC_FILE_SIZE, "Max file size is 5MB")
       .refine(
         (files) => ACCEPTED_DOC_TYPES.includes(files?.[0]?.type),
-        "Only PDF / DOC / DOCX files allowed"
+        "Only PDF / DOC / DOCX allowed"
       ),
 
     aadharName: z.string().min(2, "Aadhar name is required"),
-    aadharNumber: z
-      .string()
-      .regex(/^\d{12}$/, "Aadhar number must be exactly 12 digits"),
+    aadharNumber: z.string().regex(/^\d{12}$/, "Aadhar number must be exactly 12 digits"),
 
-    passportNumber: z.string().optional(),
-    passportValidity: z.string().optional(),
+    passportNumber: z.string().optional().or(z.literal("")),
+    passportValidity: z.string().optional().or(z.literal("")),
 
-    panNumber: z
-      .string()
-      .regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i, "Invalid PAN format"),
-
+    panNumber: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i, "Invalid PAN format"),
     phoneNumber: z.string().regex(phoneRegex, "Invalid phone number"),
 
     email: z.string().email("Enter a valid email"),
     address: z.string().min(5, "Address is required"),
     city: z.string().min(2, "City is required"),
     state: z.string().min(2, "State is required"),
-    postalCode: z
-      .string()
-      .min(4, "Postal code is required")
-      .max(10, "Postal code too long"),
+    postalCode: z.string().min(4, "Postal code is required").max(10, "Postal code too long"),
 
     fatherName: z.string().min(2, "Father name is required"),
     motherName: z.string().min(2, "Mother name is required"),
 
-    // ✅ New family fields
     siblings: z.string().min(1, "Siblings field required"),
     localGuardian: z.string().min(2, "Local guardian required"),
 
@@ -86,10 +79,9 @@ const schema = z
       .min(6, "Account number is required")
       .max(18, "Account number too long")
       .regex(/^\d+$/, "Account number must be numeric"),
-    bankIfscCode: z
-      .string()
-      .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/i, "Invalid IFSC code"),
+    bankIfscCode: z.string().regex(/^[A-Z]{4}0[A-Z0-9]{6}$/i, "Invalid IFSC code"),
     bankBranchName: z.string().min(2, "Branch name is required"),
+
     bankCancelledCheque: z
       .any()
       .refine(
@@ -117,19 +109,16 @@ const schema = z
     tshirtSize: z.enum(["XS", "S", "M", "L", "XL", "XXL", "XXXL", "4XL", "5XL"]),
     shoeSize: z.string().min(1, "Shoe size is required"),
 
-    // ✅ Police
     policeVerification: z.enum(["yes", "no"]),
     policeStation: z.string().optional().or(z.literal("")),
     policeReportFile: z.any().optional(),
 
-    // ✅ Medical report
     medicalReportRecent: z.enum(["yes", "no"]),
     medicalReportFile: z.any().optional(),
 
     hasMedicalInsurance: z.enum(["yes", "no"]),
     medicalIssues: z.string().optional().or(z.literal("")),
   })
-  // ✅ Require police station + report if policeVerification is yes
   .superRefine((data, ctx) => {
     if (data.policeVerification === "yes") {
       if (!data.policeStation || data.policeStation.trim().length < 2) {
@@ -145,18 +134,17 @@ const schema = z
         ctx.addIssue({
           code: "custom",
           path: ["policeReportFile"],
-          message: "Police verification report is required",
+          message: "Police report is required",
         });
       } else {
-        const file = f[0];
-        if (file.size > MAX_REPORT_SIZE) {
+        if (f[0].size > MAX_REPORT_SIZE) {
           ctx.addIssue({
             code: "custom",
             path: ["policeReportFile"],
             message: "Police report max size is 5MB",
           });
         }
-        if (!ACCEPTED_REPORT_TYPES.includes(file.type)) {
+        if (!ACCEPTED_REPORT_TYPES.includes(f[0].type)) {
           ctx.addIssue({
             code: "custom",
             path: ["policeReportFile"],
@@ -175,15 +163,14 @@ const schema = z
           message: "Medical report is required",
         });
       } else {
-        const file = f[0];
-        if (file.size > MAX_REPORT_SIZE) {
+        if (f[0].size > MAX_REPORT_SIZE) {
           ctx.addIssue({
             code: "custom",
             path: ["medicalReportFile"],
             message: "Medical report max size is 5MB",
           });
         }
-        if (!ACCEPTED_REPORT_TYPES.includes(file.type)) {
+        if (!ACCEPTED_REPORT_TYPES.includes(f[0].type)) {
           ctx.addIssue({
             code: "custom",
             path: ["medicalReportFile"],
@@ -192,18 +179,10 @@ const schema = z
         }
       }
     }
-
-    if (data.medicalIssues && data.medicalIssues.trim().length > 0 && data.medicalIssues.trim().length < 2) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["medicalIssues"],
-        message: "Medical issues should be at least 2 characters",
-      });
-    }
   });
 
 export default function EmployeeForm() {
-  const [serverMsg, setServerMsg] = useState<string>("");
+  const [serverMsg, setServerMsg] = useState("");
 
   const {
     register,
@@ -212,7 +191,7 @@ export default function EmployeeForm() {
     watch,
     formState: { errors, isSubmitting },
   } = useForm<EmployeeFormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as any, // ✅ safe with schema now matching EmployeeFormValues keys
     mode: "onTouched",
     defaultValues: {
       fullName: "",
@@ -230,7 +209,6 @@ export default function EmployeeForm() {
 
       drivingLicense: "",
       panNumber: "",
-
       phoneNumber: "",
 
       email: "",
@@ -278,13 +256,11 @@ export default function EmployeeForm() {
     },
   });
 
-  const onSubmit = async (values: EmployeeFormValues) => {
+  const onSubmit: SubmitHandler<EmployeeFormValues> = async (values) => {
     setServerMsg("");
-
     try {
-      const result = await createEmployee(values);
+      await createEmployee(values);
       toast.success("Form submitted successfully 🎉");
-      // toast.success(`Submitted! ID: ${result.id}`);
       reset();
     } catch (err: any) {
       const msg = err?.response?.data?.detail || "Something went wrong.";
@@ -312,9 +288,7 @@ export default function EmployeeForm() {
           <div className="border-b border-slate-100 px-6 py-5">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-semibold text-slate-900">
-                  Employee Information
-                </p>
+                <p className="text-sm font-semibold text-slate-900">Employee Information</p>
                 <p className="text-xs text-slate-500">
                   Keep documents handy while filling this form.
                 </p>

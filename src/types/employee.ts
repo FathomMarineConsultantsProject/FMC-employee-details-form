@@ -11,15 +11,20 @@ export type TshirtSize =
   | "4XL"
   | "5XL";
 
+// ✅ Reusable type for file inputs in react-hook-form
+export type RHFFile = FileList | undefined;
+
 export type EmployeeFormValues = {
   fullName: string;
   latestQualification: string;
 
+  // ✅ Required file
   documentsFile: FileList;
 
-  // (kept because you already have these in defaultValues; you can delete later if not used)
-  prCardName: string;
-  prCardValidity: string;
+  // If you are not using PR card fields in UI, keep optional.
+  // If you want them mandatory, change to: string
+  prCardName?: string;
+  prCardValidity?: string;
 
   aadharName: string;
   aadharNumber: string;
@@ -27,7 +32,9 @@ export type EmployeeFormValues = {
   passportNumber?: string;
   passportValidity?: string;
 
-  drivingLicense: string;
+  // If you're not using drivingLicense in UI, keep optional
+  drivingLicense?: string;
+
   panNumber: string;
   phoneNumber: string;
 
@@ -41,29 +48,33 @@ export type EmployeeFormValues = {
   bankAccountNumber: string;
   bankIfscCode: string;
   bankBranchName: string;
+
+  // ✅ Required file
   bankCancelledCheque: FileList;
 
   fatherName: string;
   motherName: string;
 
-  // ✅ New family fields
+  // ✅ New family
   siblings: string;
   localGuardian: string;
 
-  // ✅ Police verification
+  // ✅ Police Verification
   policeVerification: YesNo;
   policeStation?: string;
-  policeReportFile?: FileList;
+  policeReportFile?: RHFFile;
 
-  // ✅ Medical report
+  // ✅ Medical Report (last 2 months)
   medicalReportRecent: YesNo;
-  medicalReportFile?: FileList;
+  medicalReportFile?: RHFFile;
 
+  // ✅ Emergency
   emergencyContactName: string;
   emergencyContactPhone: string;
   emergencyContactEmail: string;
   emergencyContactRelation: string;
 
+  // ✅ Other Details
   hobbies: string;
   booksLikeToRead: string;
   sportsYouPlay: string;
@@ -74,11 +85,10 @@ export type EmployeeFormValues = {
   tshirtSize: TshirtSize;
   shoeSize: string;
 
+  // ✅ Medical insurance + issues
   hasMedicalInsurance: YesNo;
   medicalIssues?: string;
 };
-
-export type EmployeeCreateRequest = EmployeeFormValues;
 
 export type EmployeeCreateResponse = {
   id: number | string;
