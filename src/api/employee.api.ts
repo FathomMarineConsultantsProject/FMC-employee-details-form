@@ -6,7 +6,7 @@ import type { EmployeeFormValues, EmployeeCreateResponse } from "../types/employ
 // local: "http://127.0.0.1:8000"
 // production: your backend url
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "https://fathom-financier-backend.onrender.com" ||
 });
 
 export async function createEmployee(
