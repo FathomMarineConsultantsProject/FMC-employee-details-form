@@ -10,7 +10,9 @@ export type EmployeeFormValues = {
   prCardValidity?: string;
   drivingLicense?: string;
 
-  documentsFile: FileList; // required (as per schema)
+  // In react-hook-form, file input gives FileList | undefined at first
+  documentsFile: FileList;
+
   aadharName: string;
   aadharNumber: string;
 
@@ -29,7 +31,6 @@ export type EmployeeFormValues = {
   fatherName: string;
   motherName: string;
 
-  // ✅ THESE WERE MISSING (causing your TS errors)
   siblings: string;
   localGuardian: string;
 
@@ -38,7 +39,7 @@ export type EmployeeFormValues = {
   bankIfscCode: string;
   bankBranchName: string;
 
-  bankCancelledCheque: FileList; // required
+  bankCancelledCheque: FileList;
 
   emergencyContactName: string;
   emergencyContactPhone: string;
@@ -55,12 +56,10 @@ export type EmployeeFormValues = {
   tshirtSize: TshirtSize;
   shoeSize: string;
 
-  // ✅ Police
   policeVerification: YesNo;
   policeStation?: string;
   policeReportFile?: FileList;
 
-  // ✅ Medical
   medicalReportRecent: YesNo;
   medicalReportFile?: FileList;
 

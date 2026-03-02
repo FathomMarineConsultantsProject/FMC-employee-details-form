@@ -29,13 +29,12 @@ const ACCEPTED_REPORT_TYPES = [
   "image/webp",
 ];
 
-// ✅ IMPORTANT: schema must include ALL keys that exist in EmployeeFormValues
+// ✅ Typed schema
 const schema = z
   .object({
     fullName: z.string().min(2, "Full name is required"),
     latestQualification: z.string().min(2, "Qualification is required"),
 
-    // ✅ optional fields in your type (add in schema to avoid resolver mismatch)
     prCardName: z.string().optional().or(z.literal("")),
     prCardValidity: z.string().optional().or(z.literal("")),
     drivingLicense: z.string().optional().or(z.literal("")),
@@ -46,7 +45,10 @@ const schema = z
         (files) => files instanceof FileList && files.length === 1,
         "Document file is required"
       )
-      .refine((files) => files?.[0]?.size <= MAX_DOC_FILE_SIZE, "Max file size is 5MB")
+      .refine(
+        (files) => files?.[0]?.size <= MAX_DOC_FILE_SIZE,
+        "Max file size is 5MB"
+      )
       .refine(
         (files) => ACCEPTED_DOC_TYPES.includes(files?.[0]?.type),
         "Only PDF / DOC / DOCX allowed"
@@ -71,7 +73,10 @@ const schema = z
     motherName: z.string().min(2, "Mother name is required"),
 
     siblings: z.string().min(1, "Siblings field required"),
-    localGuardian: z.string().min(2, "Local guardian required"),
+
+    // ✅ IMPORTANT: this must exist because your type requires it
+    // If you want optional, make it optional in BOTH schema + type
+    localGuardian: z.string().optional().or(z.literal("")),
 
     bankAccountHolderName: z.string().min(2, "Account holder name is required"),
     bankAccountNumber: z
@@ -191,12 +196,12 @@ export default function EmployeeForm() {
     watch,
     formState: { errors, isSubmitting },
   } = useForm<EmployeeFormValues>({
-    resolver: zodResolver(schema) as any, // ✅ safe with schema now matching EmployeeFormValues keys
+    resolver: zodResolver(schema), // ✅ no need for `as any`
     mode: "onTouched",
     defaultValues: {
       fullName: "",
       latestQualification: "",
-      documentsFile: undefined as any,
+      documentsFile: undefined ,
 
       prCardName: "",
       prCardValidity: "",
@@ -227,7 +232,7 @@ export default function EmployeeForm() {
       bankAccountNumber: "",
       bankIfscCode: "",
       bankBranchName: "",
-      bankCancelledCheque: undefined as any,
+      bankCancelledCheque: undefined ,
 
       emergencyContactName: "",
       emergencyContactPhone: "",
@@ -246,10 +251,10 @@ export default function EmployeeForm() {
 
       policeVerification: "no",
       policeStation: "",
-      policeReportFile: undefined as any,
+      policeReportFile: undefined ,
 
       medicalReportRecent: "no",
-      medicalReportFile: undefined as any,
+      medicalReportFile: undefined ,
 
       hasMedicalInsurance: "no",
       medicalIssues: "",
