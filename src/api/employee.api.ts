@@ -1,12 +1,9 @@
-// src/api/employee.api.ts
 import axios from "axios";
-import type { EmployeeFormValues, EmployeeCreateResponse } from "../types/employee";
+import type { EmployeeCreateResponse, EmployeeFormValues } from "../types/employee";
 
-// ✅ IMPORTANT: change this when deploying
-// local: "http://127.0.0.1:8000"
-// production: your backend url
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? "https://fathom-financier-backend.onrender.com" ,
+  baseURL:
+    import.meta.env.VITE_API_BASE_URL || "https://fathom-financier-backend.onrender.com",
 });
 
 export async function createEmployee(
@@ -14,7 +11,6 @@ export async function createEmployee(
 ): Promise<EmployeeCreateResponse> {
   const fd = new FormData();
 
-  // ✅ Send JSON (without files)
   const payload = {
     ...formValues,
     documentsFile: undefined,
@@ -25,9 +21,14 @@ export async function createEmployee(
 
   fd.append("data", JSON.stringify(payload));
 
-  // ✅ Required files
-  fd.append("documentsFile", formValues.documentsFile[0]);
-fd.append("bankCancelledCheque", formValues.bankCancelledCheque[0]);
+  // ✅ Required files (guard)
+  const doc = formValues.documentsFile?.[0];
+  if (!doc) throw new Error("documentsFile is missing");
+  fd.append("documentsFile", doc);
+
+  const cheque = formValues.bankCancelledCheque?.[0];
+  if (!cheque) throw new Error("bankCancelledCheque is missing");
+  fd.append("bankCancelledCheque", cheque);
 
   // ✅ Optional files
   if (formValues.policeReportFile?.length) {

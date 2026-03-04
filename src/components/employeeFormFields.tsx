@@ -122,14 +122,14 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           label="Full Name"
           requiredMark
           placeholder="Enter your answer"
-          error={errors.fullName?.message}
+          error={errors.fullName?.message as string | undefined}
           {...register("fullName")}
         />
         <Input
           label="Latest Qualification (10th, 12th, Graduation, PG if any)"
           requiredMark
           placeholder="Enter your answer"
-          error={errors.latestQualification?.message}
+          error={errors.latestQualification?.message as string | undefined}
           {...register("latestQualification")}
         />
       </Grid>
@@ -151,7 +151,7 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           requiredMark
           type="email"
           placeholder="name@example.com"
-          error={errors.email?.message}
+          error={errors.email?.message as string | undefined}
           {...register("email")}
         />
         <Input
@@ -159,7 +159,7 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           requiredMark
           placeholder="Enter phone number"
           inputMode="tel"
-          error={errors.phoneNumber?.message}
+          error={errors.phoneNumber?.message as string | undefined}
           {...register("phoneNumber")}
         />
       </Grid>
@@ -169,7 +169,7 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
         requiredMark
         placeholder="House no, street, area"
         rows={3}
-        error={errors.address?.message}
+        error={errors.address?.message as string | undefined}
         {...register("address")}
       />
 
@@ -178,14 +178,14 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           label="City"
           requiredMark
           placeholder="Enter city"
-          error={errors.city?.message}
+          error={errors.city?.message as string | undefined}
           {...register("city")}
         />
         <Input
           label="State"
           requiredMark
           placeholder="Enter state"
-          error={errors.state?.message}
+          error={errors.state?.message as string | undefined}
           {...register("state")}
         />
       </Grid>
@@ -195,7 +195,7 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           label="Postal Code"
           requiredMark
           placeholder="Enter postal code"
-          error={errors.postalCode?.message}
+          error={errors.postalCode?.message as string | undefined}
           {...register("postalCode")}
         />
         <div />
@@ -208,7 +208,7 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           label="Account Holder Name"
           requiredMark
           placeholder="Enter account holder name"
-          error={errors.bankAccountHolderName?.message}
+          error={errors.bankAccountHolderName?.message as string | undefined}
           {...register("bankAccountHolderName")}
         />
         <Input
@@ -216,7 +216,7 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           requiredMark
           placeholder="Enter account number"
           inputMode="numeric"
-          error={errors.bankAccountNumber?.message}
+          error={errors.bankAccountNumber?.message as string | undefined}
           {...register("bankAccountNumber")}
         />
       </Grid>
@@ -227,14 +227,14 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           requiredMark
           placeholder="Example: HDFC0001234"
           hint="Format: XXXX0XXXXXX"
-          error={errors.bankIfscCode?.message}
+          error={errors.bankIfscCode?.message as string | undefined}
           {...register("bankIfscCode")}
         />
         <Input
           label="Branch Name"
           requiredMark
           placeholder="Enter branch name"
-          error={errors.bankBranchName?.message}
+          error={errors.bankBranchName?.message as string | undefined}
           {...register("bankBranchName")}
         />
       </Grid>
@@ -257,7 +257,7 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           label="Name on the Aadhar card"
           requiredMark
           placeholder="Enter your answer"
-          error={errors.aadharName?.message}
+          error={errors.aadharName?.message as string | undefined}
           {...register("aadharName")}
         />
         <Input
@@ -266,7 +266,7 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           placeholder="12 digits"
           inputMode="numeric"
           hint="We store this securely."
-          error={errors.aadharNumber?.message}
+          error={errors.aadharNumber?.message as string | undefined}
           {...register("aadharNumber")}
         />
       </Grid>
@@ -275,13 +275,13 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
         <Input
           label="Passport Number"
           placeholder="Enter your answer"
-          error={errors.passportNumber?.message}
+          error={errors.passportNumber?.message as string | undefined}
           {...register("passportNumber")}
         />
         <Input
           label="Passport Validity"
           type="date"
-          error={errors.passportValidity?.message}
+          error={errors.passportValidity?.message as string | undefined}
           {...register("passportValidity")}
         />
       </Grid>
@@ -292,7 +292,7 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           requiredMark
           placeholder="ABCDE1234F"
           hint="Example format: ABCDE1234F"
-          error={errors.panNumber?.message}
+          error={errors.panNumber?.message as string | undefined}
           {...register("panNumber")}
         />
         <div />
@@ -305,14 +305,14 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           label="Father's Name"
           requiredMark
           placeholder="Enter father name"
-          error={errors.fatherName?.message}
+          error={errors.fatherName?.message as string | undefined}
           {...register("fatherName")}
         />
         <Input
           label="Mother's Name"
           requiredMark
           placeholder="Enter mother name"
-          error={errors.motherName?.message}
+          error={errors.motherName?.message as string | undefined}
           {...register("motherName")}
         />
       </Grid>
@@ -323,14 +323,14 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           label="Siblings"
           requiredMark
           placeholder="Number or names"
-          error={errors.siblings?.message}
+          error={errors.siblings?.message as string | undefined}
           {...register("siblings")}
         />
         <Input
           label="Local Guardian"
           // requiredMark
           placeholder="Enter guardian name"
-          error={errors.localGuardian?.message}
+          error={errors.localGuardian?.message as string | undefined}
           {...register("localGuardian")}
         />
       </Grid>
@@ -342,14 +342,14 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           label="Emergency Contact Name"
           requiredMark
           placeholder="Enter name"
-          error={errors.emergencyContactName?.message}
+          error={errors.emergencyContactName?.message as string | undefined}
           {...register("emergencyContactName")}
         />
         <Input
           label="Relation"
           requiredMark
           placeholder="Father / Mother / Spouse"
-          error={errors.emergencyContactRelation?.message}
+          error={errors.emergencyContactRelation?.message as string | undefined}
           {...register("emergencyContactRelation")}
         />
       </Grid>
@@ -360,7 +360,7 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           requiredMark
           placeholder="Enter phone"
           inputMode="tel"
-          error={errors.emergencyContactPhone?.message}
+          error={errors.emergencyContactPhone?.message as string | undefined}
           {...register("emergencyContactPhone")}
         />
         <Input
@@ -368,7 +368,7 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           requiredMark
           type="email"
           placeholder="name@example.com"
-          error={errors.emergencyContactEmail?.message}
+          error={errors.emergencyContactEmail?.message as string | undefined}
           {...register("emergencyContactEmail")}
         />
       </Grid>
@@ -380,14 +380,14 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           label="Hobbies"
           requiredMark
           placeholder="Example: Reading, Gym, Music"
-          error={errors.hobbies?.message}
+          error={errors.hobbies?.message as string | undefined}
           {...register("hobbies")}
         />
         <Input
           label="What kind of books you like to read?"
           requiredMark
           placeholder="Enter your answer"
-          error={errors.booksLikeToRead?.message}
+          error={errors.booksLikeToRead?.message as string | undefined}
           {...register("booksLikeToRead")}
         />
       </Grid>
@@ -397,14 +397,14 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           label="What sports you play?"
           requiredMark
           placeholder="Enter your answer"
-          error={errors.sportsYouPlay?.message}
+          error={errors.sportsYouPlay?.message as string | undefined}
           {...register("sportsYouPlay")}
         />
         <Input
           label="Your favourite artist?"
           requiredMark
           placeholder="Enter your answer"
-          error={errors.favouriteArtist?.message}
+          error={errors.favouriteArtist?.message as string | undefined}
           {...register("favouriteArtist")}
         />
       </Grid>
@@ -414,14 +414,14 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           label="Your favourite cuisine?"
           requiredMark
           placeholder="Enter your answer"
-          error={errors.favouriteCuisine?.message}
+          error={errors.favouriteCuisine?.message as string | undefined}
           {...register("favouriteCuisine")}
         />
         <Input
           label="Your favourite movies? (Bollywood)"
           requiredMark
           placeholder="Enter your answer"
-          error={errors.favouriteMoviesBollywood?.message}
+          error={errors.favouriteMoviesBollywood?.message as string | undefined}
           {...register("favouriteMoviesBollywood")}
         />
       </Grid>
@@ -459,7 +459,7 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           label="Shoe Size"
           requiredMark
           placeholder="Example: 8 / 8.5 / 42"
-          error={errors.shoeSize?.message}
+          error={errors.shoeSize?.message as string | undefined}
           {...register("shoeSize")}
         />
       </Grid>
@@ -494,7 +494,7 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
         <Input
           label="Which Police Station?"
           placeholder="Enter police station name"
-          error={errors.policeStation?.message}
+          error={errors.policeStation?.message as string | undefined}
           {...register("policeStation")}
         />
       </Grid>
@@ -541,7 +541,7 @@ export default function EmployeeFormFields({ register, errors, watch }: Props) {
           label="Any medical issues"
           placeholder="Mention if any (or write 'None')"
           rows={3}
-          error={errors.medicalIssues?.message}
+          error={errors.medicalIssues?.message as string | undefined}
           {...register("medicalIssues")}
         />
       </Grid>
